@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Midiateca</title>
+    
+    <!-- leaflet css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+        }
+
+
+        #map{
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+
+</head>
+<body>
+    <div id="map"></div>
+</body>
+</html>
+
+<!-- leaflet js -->
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+<script>
+    //map initialization
+    var map = L.map('map').setView([-19.700, -40.500], 7.5);
+    
+
+    /******************************
+                LAYERS
+    *******************************/
+
+
+    //OSM LAYER -> OPEN STREET MAP
+    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    osm.addTo(map);
+    
+
+    //GOOGLE MAP
+    var GoogleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+    });
+    //GoogleStreets.addTo(map);
+
+
+    //GOOGLE SATELITE MAP
+    var GoogleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+    // GoogleSat.addTo(map)
+    
+
+
+    
+    var Popupcontent1 = '<p>TIPO: pintura<br />OBRA: Ouro Preto Lapidada<br />DATA: 1979';
+    var Popupcontent2 = '<p>TIPO: pintura<br />OBRA: Desastre<br />DATA: 1955';
+
+    
+    var OuroPreto = L.marker([-20.320579377361447, -40.33857921005433]).bindPopup(Popupcontent1).openPopup();
+    var Desastre = L.marker([-20.319980093494728, -40.33432356441856]).bindPopup(Popupcontent2).openPopup();
+
+    OuroPreto.addTo(map);
+    Desastre.addTo(map);
+
+    console.log(OuroPreto.toGeoJSON())
+    console.log(Desastre.toGeoJSON())
+
+
+    /*var popup = L.popup([-20.320579377361447, -40.33857921005433], {content: '<p>Hello world!<br />This is a nice popup.</p>'});
+    popup.openOn(map);
+                            POPUP que abre sem que seja clicado em algum lugar*/
+
+
+
+    /****************
+    Layer controller
+    *****************/
+    
+    var baseMaps = {
+    "OpenStreetMap": osm,
+    "Google Maps": GoogleStreets,
+    "Google Satelite": GoogleSat 
+    };
+
+    var overlayMaps = {
+    "Marker": OuroPreto,
+    "Mark": Desastre
+    };
+
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+
+
+
+
+</script>
