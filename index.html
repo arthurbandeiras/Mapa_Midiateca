@@ -30,6 +30,8 @@
 
 <!-- leaflet js -->
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+<script src="./data/map.js"></script>
+
 
 <script>
     //map initialization
@@ -103,8 +105,22 @@
 
     L.control.layers(baseMaps, overlayMaps).addTo(map);
 
+    /************************
+            GeoJSON 
+    *************************/
 
-
-
+    L.geoJSON(mapJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b>Tipo: </b>' + feature.properties.TIPO + '<br>'
+                        + '<b>Obra: </b>' + feature.properties.OBRA + '<br>'
+                        + '<b>Autor: </b>' + feature.properties.AUTOR + '<br>'
+                        + '<b>Data: </b>' + feature.properties.DATA + '<br>'
+                        + '<b>Cidade: </b>' + feature.properties.CIDADE + '<br>'
+                        + '<b>Instituição: </b>' + feature.properties.INSTITUIÇÃO + '<br>'
+                        + '<b>UF: </b>' + feature.properties.UF + '<br>'
+                        + '<b>Acesso: </b>' + '<a href=' + feature.properties.ACESSO + '>Clique aqui!</a>'+ '<br>'
+                )
+        }
+    }).addTo(map)
 
 </script>
