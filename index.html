@@ -29,8 +29,10 @@
 </html>
 
 <!-- leaflet js -->
+
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
 <script src="./data/map.js"></script>
+
 
 
 <script>
@@ -64,22 +66,6 @@
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
     // GoogleSat.addTo(map)
-    
-
-
-    
-    var Popupcontent1 = '<p>TIPO: pintura<br />OBRA: Ouro Preto Lapidada<br />DATA: 1979';
-    var Popupcontent2 = '<p>TIPO: pintura<br />OBRA: Desastre<br />DATA: 1955';
-
-    
-    var OuroPreto = L.marker([-20.320579377361447, -40.33857921005433]).bindPopup(Popupcontent1).openPopup();
-    var Desastre = L.marker([-20.319980093494728, -40.33432356441856]).bindPopup(Popupcontent2).openPopup();
-
-    OuroPreto.addTo(map);
-    Desastre.addTo(map);
-
-    console.log(OuroPreto.toGeoJSON())
-    console.log(Desastre.toGeoJSON())
 
 
     /*var popup = L.popup([-20.320579377361447, -40.33857921005433], {content: '<p>Hello world!<br />This is a nice popup.</p>'});
@@ -88,28 +74,12 @@
 
 
 
-    /****************
-    Layer controller
-    *****************/
-    
-    var baseMaps = {
-    "OpenStreetMap": osm,
-    "Google Maps": GoogleStreets,
-    "Google Satelite": GoogleSat 
-    };
-
-    var overlayMaps = {
-    "Marker": OuroPreto,
-    "Mark": Desastre
-    };
-
-    L.control.layers(baseMaps, overlayMaps).addTo(map);
 
     /************************
             GeoJSON 
     *************************/
-
-    L.geoJSON(mapJson, {
+    
+    var todos_data = L.geoJSON(mapJson, {
         onEachFeature: function (feature, layer) {
             layer.bindPopup('<b>Tipo: </b>' + feature.properties.TIPO + '<br>'
                         + '<b>Obra: </b>' + feature.properties.OBRA + '<br>'
@@ -122,5 +92,22 @@
                 )
         }
     }).addTo(map)
+  
+    /****************
+    Layer controller
+    *****************/
+    
+    var baseMaps = {
+    "OpenStreetMap": osm,
+    "Google Maps": GoogleStreets,
+    "Google Satelite": GoogleSat 
+    };
+
+    var overlayMaps = {
+    "Todos": todos_data
+    };
+
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
+
 
 </script>
