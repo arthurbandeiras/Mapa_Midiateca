@@ -13,101 +13,206 @@
         body{
             margin: 0;
             padding: 0;
+            /* display: flex;
+            justify-content: center;
+            align-items: center; */
         }
-
-
+                
         #map{
             width: 100%;
             height: 100vh;
+            position: relative;
+            z-index: 1;
         }
-    </style>
+
+        #window {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            width: 15%;
+            height: 50%;
+            border: 1px solid gray;
+            border-radius: 5px;
+            background-color: white;
+            z-index: 2;
+        }
+
+        .header{
+            background-color: gray;
+            color: white;
+            height: 20px;
+            line-height: 20px;
+            padding: 5px;
+            cursor: move;
+        }
+
+        #titlebar{
+            display: inline-block;
+        }
+
+        .close-btn{
+            float: right;
+            cursor: pointer;
+        }
+
+        .content{
+            padding: 5px;
+            user-select: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        #titulo_pesquisa{
+            font-style: normal;
+            text-align: center;
+
+        }
+
+        </style>
 
 </head>
 <body>
     <div id="map"></div>
+    
+    <div id="window">
+        <div class="header"> 
+            <div id="titlebar">Aba de Pesquisa</div>
+            <div class="close-btn">&times;</div>
+        </div>
+
+        <div class="content">
+            <!-- <input onchange="changeRGB()" oninput="changeRGB()" 
+            type="range" id="slide_ano" name="slide_ano" value="255" min="0" max="255">
+            <input type="search" name="procurar" id="search"> -->
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="./data/map.js"></script>
+
+    <script>
+        var windowDiv = document.getElementById("window");
+        var titlebarDiv = document.getElementById("titlebar");
+
+        var dragStart = null;
+        var offsetStart = null;
+
+        titlebarDiv.addEventListener("mousedown", function(event) {
+            dragStart = { x: event.clientX, y: event.clientY };
+            offsetStart = { x: windowDiv.offsetLeft, y: windowDiv.offsetTop };
+            document.addEventListener("mousemove", onDrag);
+            document.addEventListener("mouseup", onDragEnd);
+        });
+
+        function onDrag(event) {
+            if (dragStart) {
+                var dx = event.clientX - dragStart.x;
+                var dy = event.clientY - dragStart.y;
+                windowDiv.style.left = (offsetStart.x + dx) + "px";
+                windowDiv.style.top = (offsetStart.y + dy) + "px";
+            }
+        }
+
+        function onDragEnd(event) {
+            dragStart = null;
+            offsetStart = null;
+            document.removeEventListener("mousemove", onDrag);
+            document.removeEventListener("mouseup", onDragEnd);
+        }
+
+    </script>
+
+    <script>
+        $(function() {
+            $('.closeable .close-btn').click(function(){
+                $(this).closest('.closeable').hide();
+            });
+        });
+    </script>
+
+
+        <!-- FILTER CONTROL
+        <input onchange="changeRGB()" oninput="changeRGB()" 
+        type="range" id="slide_ano" name="slide_ano" value="255" min="0" max="255">
+        
+        <div id="valor_Ano" xstyle="background-color: white
+        ; border-radius: 5px; opacity: 0.8; font-;" ></div> -->
+        
+        <!-- leaflet js -->
+
+
+    <script>
+        //map initialization
+        var map = L.map('map').setView([-19.700, -40.500], 7.5);
+        
+        
+        /******************************
+                    LAYERS
+        *******************************/
+        
+        
+        //OPEN STREET MAP
+        var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        osm.addTo(map);
+        
+        
+        //GOOGLE MAP
+        var GoogleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3']
+        });
+        //GoogleStreets.addTo(map);
+        
+        
+        //GOOGLE SATELITE MAP
+        var GoogleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+        // GoogleSat.addTo(map)
+        
+        
+        /*var popup = L.popup([-20.320579377361447, -40.33857921005433], {content: '<p>Hello world!<br />This is a nice popup.</p>'});
+        popup.openOn(map);
+        POPUP que abre sem que seja clicado em algum lugar*/
+        
+        
+        /************************
+                GeoJSON 
+        *************************/
+        
+        var todos_data = L.geoJSON(mapJson, {
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('<b>Tipo: </b>' + feature.properties.TIPO + '<br>'
+                + '<b>Obra: </b>' + feature.properties.OBRA + '<br>'
+                + '<b>Autor: </b>' + feature.properties.AUTOR + '<br>'
+                + '<b>Data: </b>' + feature.properties.DATA + '<br>'
+                + '<b>Cidade: </b>' + feature.properties.CIDADE + '<br>'
+                + '<b>Instituição: </b>' + feature.properties.INSTITUIÇÃO + '<br>'
+                + '<b>UF: </b>' + feature.properties.UF + '<br>'
+                + '<b>Acesso: </b>' + '<a href=' + feature.properties.ACESSO + '>Clique aqui!</a>'+ '<br>'
+                )
+            }
+        }).addTo(map)
+        
+        /************************
+            Layer controller
+        *************************/
+        
+        var baseMaps = {
+            "OpenStreetMap": osm,
+            "Google Maps": GoogleStreets,
+            "Google Satelite": GoogleSat 
+        };
+
+        // var overlayMaps = {
+        //     "Todos": todos_data
+        // };
+
+        L.control.layers(baseMaps, null).addTo(map);   
+    </script>
+
 </body>
 </html>
-
-<!-- leaflet js -->
-
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
-<script src="./data/map.js"></script>
-
-
-
-<script>
-    //map initialization
-    var map = L.map('map').setView([-19.700, -40.500], 7.5);
-    
-
-    /******************************
-                LAYERS
-    *******************************/
-
-
-    //OSM LAYER -> OPEN STREET MAP
-    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-    osm.addTo(map);
-    
-
-    //GOOGLE MAP
-    var GoogleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
-        maxZoom: 20,
-        subdomains:['mt0','mt1','mt2','mt3']
-    });
-    //GoogleStreets.addTo(map);
-
-
-    //GOOGLE SATELITE MAP
-    var GoogleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-    });
-    // GoogleSat.addTo(map)
-
-
-    /*var popup = L.popup([-20.320579377361447, -40.33857921005433], {content: '<p>Hello world!<br />This is a nice popup.</p>'});
-    popup.openOn(map);
-                            POPUP que abre sem que seja clicado em algum lugar*/
-
-
-
-
-    /************************
-            GeoJSON 
-    *************************/
-    
-    var todos_data = L.geoJSON(mapJson, {
-        onEachFeature: function (feature, layer) {
-            layer.bindPopup('<b>Tipo: </b>' + feature.properties.TIPO + '<br>'
-                        + '<b>Obra: </b>' + feature.properties.OBRA + '<br>'
-                        + '<b>Autor: </b>' + feature.properties.AUTOR + '<br>'
-                        + '<b>Data: </b>' + feature.properties.DATA + '<br>'
-                        + '<b>Cidade: </b>' + feature.properties.CIDADE + '<br>'
-                        + '<b>Instituição: </b>' + feature.properties.INSTITUIÇÃO + '<br>'
-                        + '<b>UF: </b>' + feature.properties.UF + '<br>'
-                        + '<b>Acesso: </b>' + '<a href=' + feature.properties.ACESSO + '>Clique aqui!</a>'+ '<br>'
-                )
-        }
-    }).addTo(map)
-  
-    /****************
-    Layer controller
-    *****************/
-    
-    var baseMaps = {
-    "OpenStreetMap": osm,
-    "Google Maps": GoogleStreets,
-    "Google Satelite": GoogleSat 
-    };
-
-    var overlayMaps = {
-    "Todos": todos_data
-    };
-
-    L.control.layers(baseMaps, overlayMaps).addTo(map);
-
-
-</script>
