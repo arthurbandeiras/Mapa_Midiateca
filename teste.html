@@ -6,12 +6,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 
+    <style>
+        #divFlutuante {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 200px;
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+            display: none;
+        }
 
-    
+        #fecharDivFlutuante {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 20px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+    </style>
+
 </head>
 <body>
-      
+    <div id="divFlutuante">
+        <button id="fecharDivFlutuante">&times;</button>
+        <!-- conteúdo da div flutuante aqui -->
+    </div>
 
-      
+    <button onclick="toggleDivFlutuante()">Mostrar/Esconder Div Flutuante</button>
+
+    <script>
+        // função para exibir ou ocultar a div flutuante
+        function toggleDivFlutuante() {
+        var divFlutuante = document.getElementById("divFlutuante");
+        if (divFlutuante.style.display === "none") {
+            divFlutuante.style.display = "block";
+        } else {
+            divFlutuante.style.display = "none";
+        }
+        }
+
+        // torna a div flutuante arrastável
+        var divFlutuante = document.getElementById("divFlutuante");
+        var isDragging = false;
+        var mouseX, mouseY;
+
+        divFlutuante.addEventListener("mousedown", function(event) {
+        isDragging = true;
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        });
+
+        document.addEventListener("mousemove", function(event) {
+            if (isDragging) {
+                var deltaX = event.clientX - mouseX;
+                var deltaY = event.clientY - mouseY;
+                divFlutuante.style.left = (divFlutuante.offsetLeft + deltaX) + "px";
+                divFlutuante.style.top = (divFlutuante.offsetTop + deltaY) + "px";
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+            }
+        });
+            
+        document.addEventListener("mouseup", function(event) {
+            isDragging = false;
+        });
+
+        // fecha a div flutuante quando o botão de fechar é clicado
+        var fecharDivFlutuante = document.getElementById("fecharDivFlutuante");
+        fecharDivFlutuante.addEventListener("click", function() {
+            var divFlutuante = document.getElementById("divFlutuante");
+            divFlutuante.style.display = "none";
+        });
+    </script>
+
+    
 </body>
 </html>

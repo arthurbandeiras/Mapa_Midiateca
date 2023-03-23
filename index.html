@@ -29,12 +29,14 @@
             position: absolute;
             top: 50px;
             left: 50px;
+            transform: translate(-50%, -50%);
             width: 15%;
             height: 50%;
             border: 1px solid gray;
             border-radius: 5px;
             background-color: white;
             z-index: 2;
+            display: none;
         }
 
         .header{
@@ -80,55 +82,69 @@
             <div class="close-btn">&times;</div>
         </div>
 
-        <div class="content">
-            <!-- <input onchange="changeRGB()" oninput="changeRGB()" 
-            type="range" id="slide_ano" name="slide_ano" value="255" min="0" max="255">
-            <input type="search" name="procurar" id="search"> -->
-        </div>
+        <script>
+            $(function() {
+                $('.closeable .close-btn').click(function(){
+                    $(this).closest('.closeable').hide();
+                });
+            });
+        </script>
+
+        <button id="fecharWindow">&times;</button>
+
+        <div class="content"></div>
+
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <script src="./data/map.js"></script>
 
     <script>
-        var windowDiv = document.getElementById("window");
-        var titlebarDiv = document.getElementById("titlebar");
 
-        var dragStart = null;
-        var offsetStart = null;
-
-        titlebarDiv.addEventListener("mousedown", function(event) {
-            dragStart = { x: event.clientX, y: event.clientY };
-            offsetStart = { x: windowDiv.offsetLeft, y: windowDiv.offsetTop };
-            document.addEventListener("mousemove", onDrag);
-            document.addEventListener("mouseup", onDragEnd);
-        });
-
-        function onDrag(event) {
-            if (dragStart) {
-                var dx = event.clientX - dragStart.x;
-                var dy = event.clientY - dragStart.y;
-                windowDiv.style.left = (offsetStart.x + dx) + "px";
-                windowDiv.style.top = (offsetStart.y + dy) + "px";
+        function toggleWindow(){
+            var divWindow = document.getElementById("window");
+            if (divWindow.style.display === "none") {
+                divWindow.style.display = "block";
+            } else {
+                divWindow.style.display = "none"
             }
         }
 
-        function onDragEnd(event) {
-            dragStart = null;
-            offsetStart = null;
-            document.removeEventListener("mousemove", onDrag);
-            document.removeEventListener("mouseup", onDragEnd);
-        }
+        var divWindow = document.getElementById("window");
+        var isDragging = false;
+        var mouseX, mouseY;
 
-    </script>
+        divWindow.addEventListener("mousedown", function(event) {
+            isDragging = true;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        })
 
-    <script>
-        $(function() {
-            $('.closeable .close-btn').click(function(){
-                $(this).closest('.closeable').hide();
-            });
+        document.addEventListener("mousemove", function(event) {
+            if (isDragging) {
+                var deltaX = event.clientX - mouseX;
+                var deltaY = event.clientY - mouseY;
+                divWindow.style.left = (divFlutuante.offsetLeft + deltaX) + "px";
+                divWindow.style.top = (divFlutuante.offsetTop + deltaY) + "px";
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+            }
         });
+
+        document.addEventListener("mouseup", function(event) {
+            isDragging = false;
+        });
+
+        var fecharWindow = document.getElementById("fecharWindow");
+
+        fecharWindow.addEventListener("click", function() {
+            var divWindow = document.getElementById("window");
+            divWindow.style.display = "none";
+        });
+
     </script>
+
 
 
         <!-- FILTER CONTROL
