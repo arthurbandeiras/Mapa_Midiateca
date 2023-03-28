@@ -13,9 +13,6 @@
         body{
             margin: 0;
             padding: 0;
-            /* display: flex;
-            justify-content: center;
-            align-items: center; */
         }
                 
         #map{
@@ -25,138 +22,238 @@
             z-index: 1;
         }
 
-        #window {
+        .SearchBox {
             position: absolute;
-            top: 50px;
-            left: 50px;
-            transform: translate(-50%, -50%);
-            width: 15%;
-            height: 50%;
-            border: 1px solid gray;
-            border-radius: 5px;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
             background-color: white;
-            z-index: 2;
-            display: none;
+            border: 2px solid rgba(50, 50, 50, 0.25);
+            border-radius: 5px;
+            margin: 0;
+            padding: 0;
+            display: block;
+            box-sizing: border-box;
+            z-index: 999;
         }
 
-        .header{
-            background-color: gray;
+        .SearchBox .header{
+            padding: 5px;
+            background-color: grey;
             color: white;
-            height: 20px;
-            line-height: 20px;
-            padding: 5px;
-            cursor: move;
-        }
-
-        #titlebar{
-            display: inline-block;
-        }
-
-        .close-btn{
-            float: right;
-            cursor: pointer;
-        }
-
-        .content{
-            padding: 5px;
             user-select: none;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            cursor: move;
+            font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+            font-size: 1.08333em;
+            z-index: 999;
+        }
+
+        .year-input{
+            width: 100%;
+            display: flex;
+            margin: 30px 0 35px;
+        }
+
+        .year-input .field{
+            display: flex;
+            width: 100%;
+            margin: 30px 0 35px;
+        }
+
+        .field input{
+            width: 100%;
+            height: 100%;
+            outline: none;
+            margin-left: 12px;
             border-radius: 5px;
             text-align: center;
+            border: 1px solid grey;
+            -moz-appearance: textfield;
         }
 
-        #titulo_pesquisa{
-            font-style: normal;
-            text-align: center;
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
 
+        .year-input .separator{
+            width: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slider{
+            height: 5px;
+            position: relative;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .slider .progress{
+            height: 100%;
+            left: 25%;
+            right: 25%;
+            position: absolute;
+            border-radius: 5px;
+            background: #E30425;
+        }
+
+        .range-input{
+            position: relative;
+        }
+
+        .range-input input{
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            top: -5px;
+            background: none;
+            pointer-events: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb{
+            height: 17px;
+            width: 17px;
+            border-radius: 50%;
+            background: #E30425;
+            pointer-events: auto;
+            -webkit-appearance: none;
+            box-shadow: 0 0 6px rgba(0,0,0,0.05);
+        }
+
+        input[type="range"]::-moz-range-thumb{
+            height: 17px;
+            width: 17px;
+            border: none;
+            border-radius: 50%;
+            background: #E30425;
+            pointer-events: auto;
+            -moz-appearance: none;
+            box-shadow: 0 0 6px rgba(0,0,0,0.05);
         }
 
         </style>
 
 </head>
 <body>
-    <div id="map"></div>
-    
-    <div id="window">
-        <div class="header"> 
-            <div id="titlebar">Aba de Pesquisa</div>
-            <div class="close-btn">&times;</div>
-        </div>
-
-        <script>
-            $(function() {
-                $('.closeable .close-btn').click(function(){
-                    $(this).closest('.closeable').hide();
-                });
-            });
-        </script>
-
-        <button id="fecharWindow">&times;</button>
-
-        <div class="content"></div>
-
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <script src="./data/map.js"></script>
 
+    <div id="map"></div>
+    
+    <div class="SearchBox">
+        <div class="header">Aba de pesquisa</div>
+        <div class="year-input">
+            <div class="field">
+                <span>Min</span>
+                <input type="number" class="input-min" value="2500">
+            </div>
+            <div class="separator">-</div>
+            <div class="field">
+                <span>Max</span>
+                <input type="number" class="input-max" value="7500">
+            </div>
+        </div>
+        <div class="slider">
+            <div class="progress"></div>
+        </div>
+        <div class="range-input">
+            <input type="range" class="range-min" min="0" max="10000" value="2500" step="100">
+            <input type="range" class="range-max" min="0" max="10000" value="7500" step="100">
+        </div>
+    </div>
+    
     <script>
+        const rangeInput = document.querySelectorAll(".range-input input"),
+        priceInput = document.querySelectorAll(".price-input input"),
+        range = document.querySelector(".slider .progress");
+        let priceGap = 1000;
 
-        function toggleWindow(){
-            var divWindow = document.getElementById("window");
-            if (divWindow.style.display === "none") {
-                divWindow.style.display = "block";
-            } else {
-                divWindow.style.display = "none"
-            }
-        }
-
-        var divWindow = document.getElementById("window");
-        var isDragging = false;
-        var mouseX, mouseY;
-
-        divWindow.addEventListener("mousedown", function(event) {
-            isDragging = true;
-            mouseX = event.clientX;
-            mouseY = event.clientY;
-        })
-
-        document.addEventListener("mousemove", function(event) {
-            if (isDragging) {
-                var deltaX = event.clientX - mouseX;
-                var deltaY = event.clientY - mouseY;
-                divWindow.style.left = (divFlutuante.offsetLeft + deltaX) + "px";
-                divWindow.style.top = (divFlutuante.offsetTop + deltaY) + "px";
-                mouseX = event.clientX;
-                mouseY = event.clientY;
-            }
+        priceInput.forEach(input =>{
+            input.addEventListener("input", e =>{
+                let minPrice = parseInt(priceInput[0].value),
+                maxPrice = parseInt(priceInput[1].value);
+                
+                if((maxPrice - minPrice >= priceGap) && maxPrice <= rangeInput[1].max){
+                    if(e.target.className === "input-min"){
+                        rangeInput[0].value = minPrice;
+                        range.style.left = ((minPrice / rangeInput[0].max) * 100) + "%";
+                    }else{
+                        rangeInput[1].value = maxPrice;
+                        range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+                    }
+                }
+            });
         });
 
-        document.addEventListener("mouseup", function(event) {
-            isDragging = false;
+        rangeInput.forEach(input =>{
+            input.addEventListener("input", e =>{
+                let minVal = parseInt(rangeInput[0].value),
+                maxVal = parseInt(rangeInput[1].value);
+
+                if((maxVal - minVal) < priceGap){
+                    if(e.target.className === "range-min"){
+                        rangeInput[0].value = maxVal - priceGap
+                    }else{
+                        rangeInput[1].value = minVal + priceGap;
+                    }
+                }else{
+                    priceInput[0].value = minVal;
+                    priceInput[1].value = maxVal;
+                    range.style.left = ((minVal / rangeInput[0].max) * 100) + "%";
+                    range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
+                }
+            });
         });
-
-        var fecharWindow = document.getElementById("fecharWindow");
-
-        fecharWindow.addEventListener("click", function() {
-            var divWindow = document.getElementById("window");
-            divWindow.style.display = "none";
-        });
-
     </script>
+    
+    <script>       
+        // torna a div flutuante arrastável
+        var SearchBox = document.querySelector('.SearchBox');
+        var header = document.querySelector('.header');
 
+        var InitialPosition = { x: 0, y: 0};
+        var CurrentPosition = { x: 0, y: 0};
+        var FinalPosition = { x: 0, y: 0};
 
+        var dragSearchBox = function(event){
+            CurrentPosition.x = event.clientX - InitialPosition.x;
+            CurrentPosition.y = event.clientY - InitialPosition.y;
 
-        <!-- FILTER CONTROL
-        <input onchange="changeRGB()" oninput="changeRGB()" 
-        type="range" id="slide_ano" name="slide_ano" value="255" min="0" max="255">
-        
-        <div id="valor_Ano" xstyle="background-color: white
-        ; border-radius: 5px; opacity: 0.8; font-;" ></div> -->
-        
-        <!-- leaflet js -->
+            SearchBox.style.top = Math.max(0, CurrentPosition.y) + 'px';
+            SearchBox.style.left = Math.max(0, CurrentPosition.x) + 'px';
+        };
 
+        var dropSearchBox = function(){
+            FinalPosition.x = CurrentPosition.x;
+            FinalPosition.y = CurrentPosition.y;
 
+            document.removeEventListener('mousemove', dragSearchBox);
+            document.removeEventListener('mouseup', dropSearchBox);
+        };
+
+        header.addEventListener('mousedown', function(event){
+            InitialPosition.x = event.clientX - SearchBox.offsetLeft;
+            InitialPosition.y = event.clientY - SearchBox.offsetTop;
+
+            document.addEventListener('mousemove', dragSearchBox);
+            document.addEventListener('mouseup', dropSearchBox);
+        });
+
+        </script>
+    
+    
+    
+    
+    <!-- leaflet js -->
+    
+    
     <script>
         //map initialization
         var map = L.map('map').setView([-19.700, -40.500], 7.5);
@@ -223,11 +320,7 @@
             "Google Satelite": GoogleSat 
         };
 
-        // var overlayMaps = {
-        //     "Todos": todos_data
-        // };
-
-        L.control.layers(baseMaps, null).addTo(map);   
+        L.control.layers(baseMaps, null, {collapsed: false}).addTo(map);   
     </script>
 
 </body>
