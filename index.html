@@ -24,10 +24,10 @@
 
         .SearchBox {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 400px;
-            height: 400px;
+            top: 10%;
+            left: 5%;
+            width: 20%;
+            height: 50%;
             background-color: white;
             border: 2px solid rgba(50, 50, 50, 0.25);
             border-radius: 5px;
@@ -52,9 +52,9 @@
         }
 
         .year-input{
-            width: 100%;
+            width: 70%;
             display: flex;
-            margin: 30px 0 35px;
+            margin: auto;
         }
 
         .year-input .field{
@@ -80,7 +80,7 @@
         }
 
         .year-input .separator{
-            width: 130px;
+            width: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -88,15 +88,17 @@
 
         .slider{
             height: 5px;
+            width: 70%;
+            margin-left: 15%;
             position: relative;
-            background: white;
+            background: #ff8093b9;
             border-radius: 5px;
         }
 
         .slider .progress{
             height: 100%;
-            left: 25%;
-            right: 25%;
+            left: 0%;
+            right: 0%;
             position: absolute;
             border-radius: 5px;
             background: #E30425;
@@ -108,9 +110,10 @@
 
         .range-input input{
             position: absolute;
-            width: 100%;
+            width: 70%;
+            margin-left: 15%;
             height: 5px;
-            top: -5px;
+            top: -6px;
             background: none;
             pointer-events: none;
             -webkit-appearance: none;
@@ -130,12 +133,20 @@
         input[type="range"]::-moz-range-thumb{
             height: 17px;
             width: 17px;
-            border: none;
             border-radius: 50%;
             background: #E30425;
             pointer-events: auto;
             -moz-appearance: none;
             box-shadow: 0 0 6px rgba(0,0,0,0.05);
+        }
+
+        .submit{
+            position: inherit;
+            margin: auto;
+            align-items: center;
+            justify-content: center;
+            margin-left: 40%;
+            margin-top: 10%;
         }
 
         </style>
@@ -152,72 +163,92 @@
         <div class="year-input">
             <div class="field">
                 <span>Min</span>
-                <input type="number" class="input-min" value="2500">
+                <input type="number" class="input-min" value="1500">
             </div>
             <div class="separator">-</div>
             <div class="field">
                 <span>Max</span>
-                <input type="number" class="input-max" value="7500">
+                <input type="number" class="input-max" value="2030">
             </div>
         </div>
         <div class="slider">
             <div class="progress"></div>
         </div>
         <div class="range-input">
-            <input type="range" class="range-min" min="0" max="10000" value="2500" step="100">
-            <input type="range" class="range-max" min="0" max="10000" value="7500" step="100">
+            <input type="range" class="range-min" min="1500" max="2030" value="1500" step="10">
+            <input type="range" class="range-max" min="1500" max="2030" value="2030" step="10">
         </div>
     </div>
     
     <script>
-        const rangeInput = document.querySelectorAll(".range-input input"),
-        priceInput = document.querySelectorAll(".price-input input"),
-        range = document.querySelector(".slider .progress");
-        let priceGap = 1000;
+        /***********************
+            Year Search Control
+        ************************/
 
-        priceInput.forEach(input =>{
+        const rangeInput = document.querySelectorAll(".range-input input"),
+        yearInput = document.querySelectorAll(".year-input input"),
+        range = document.querySelector(".slider .progress");
+        let yearGap = 10;
+    
+        yearInput.forEach(input =>{
             input.addEventListener("input", e =>{
-                let minPrice = parseInt(priceInput[0].value),
-                maxPrice = parseInt(priceInput[1].value);
+                let minYear = parseInt(yearInput[0].value),
+                maxYear = parseInt(yearInput[1].value);
+                console.log(minYear, maxYear, rangeInput[0].min);
                 
-                if((maxPrice - minPrice >= priceGap) && maxPrice <= rangeInput[1].max){
+                if((maxYear - minYear >= yearGap) && maxYear <= rangeInput[1].max){
                     if(e.target.className === "input-min"){
-                        rangeInput[0].value = minPrice;
-                        range.style.left = ((minPrice / rangeInput[0].max) * 100) + "%";
+                        rangeInput[0].value = minYear;
+                        range.style.left = (((minYear-rangeInput[0].min) / (rangeInput[0].max-rangeInput[0].min)) * 100) + "%";
                     }else{
-                        rangeInput[1].value = maxPrice;
-                        range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+                        rangeInput[1].value = maxYear;
+                        range.style.right = 100 - ((maxYear-rangeInput[0].min) / (rangeInput[1].max-rangeInput[0].min)) * 100 + "%";
                     }
                 }
             });
         });
 
+        var Minrange = 1500, Maxrange = 2030;
+    
         rangeInput.forEach(input =>{
             input.addEventListener("input", e =>{
-                let minVal = parseInt(rangeInput[0].value),
+                var minVal = parseInt(rangeInput[0].value),
                 maxVal = parseInt(rangeInput[1].value);
-
-                if((maxVal - minVal) < priceGap){
+    
+                if((maxVal - minVal) < yearGap){
                     if(e.target.className === "range-min"){
-                        rangeInput[0].value = maxVal - priceGap
+                        rangeInput[0].value = maxVal - yearGap
                     }else{
-                        rangeInput[1].value = minVal + priceGap;
+                        rangeInput[1].value = minVal + yearGap;
                     }
                 }else{
-                    priceInput[0].value = minVal;
-                    priceInput[1].value = maxVal;
-                    range.style.left = ((minVal / rangeInput[0].max) * 100) + "%";
-                    range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
+                    yearInput[0].value = minVal;
+                    yearInput[1].value = maxVal;
+                    range.style.left = (((minVal-rangeInput[0].min) / (rangeInput[0].max-rangeInput[0].min)) * 100) + "%";
+                    range.style.right = 100 - ((maxVal-rangeInput[0].min) / (rangeInput[1].max-rangeInput[0].min)) * 100 + "%";
                 }
+                console.log(rangeInput[0].value, rangeInput[1].value)
+                // Minrange = rangeInput[0].value;
+                // Maxrange = rangeInput[1].value;
             });
         });
+
+        // console.log(Minrange, Maxrange);
+        
+        // var inputAno = document.querySelector(".year-input input .input-min");
+        // console.log(inputAnovalue)
     </script>
+
     
     <script>       
-        // torna a div flutuante arrastável
+
+        /**************************
+            Control Search Box
+        ***************************/
+
         var SearchBox = document.querySelector('.SearchBox');
         var header = document.querySelector('.header');
-
+        
         var InitialPosition = { x: 0, y: 0};
         var CurrentPosition = { x: 0, y: 0};
         var FinalPosition = { x: 0, y: 0};
@@ -225,7 +256,7 @@
         var dragSearchBox = function(event){
             CurrentPosition.x = event.clientX - InitialPosition.x;
             CurrentPosition.y = event.clientY - InitialPosition.y;
-
+            
             SearchBox.style.top = Math.max(0, CurrentPosition.y) + 'px';
             SearchBox.style.left = Math.max(0, CurrentPosition.x) + 'px';
         };
@@ -233,7 +264,7 @@
         var dropSearchBox = function(){
             FinalPosition.x = CurrentPosition.x;
             FinalPosition.y = CurrentPosition.y;
-
+            
             document.removeEventListener('mousemove', dragSearchBox);
             document.removeEventListener('mouseup', dropSearchBox);
         };
@@ -246,24 +277,18 @@
             document.addEventListener('mouseup', dropSearchBox);
         });
 
-        </script>
-    
-    
-    
-    
-    <!-- leaflet js -->
-    
+    </script>
     
     <script>
         //map initialization
         var map = L.map('map').setView([-19.700, -40.500], 7.5);
         
         
-        /******************************
-                    LAYERS
-        *******************************/
+        /***************
+            LAYERS
+        ****************/
         
-        
+       
         //OPEN STREET MAP
         var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -285,11 +310,6 @@
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
         });
         // GoogleSat.addTo(map)
-        
-        
-        /*var popup = L.popup([-20.320579377361447, -40.33857921005433], {content: '<p>Hello world!<br />This is a nice popup.</p>'});
-        popup.openOn(map);
-        POPUP que abre sem que seja clicado em algum lugar*/
         
         
         /************************
@@ -319,6 +339,8 @@
             "Google Maps": GoogleStreets,
             "Google Satelite": GoogleSat 
         };
+
+
 
         L.control.layers(baseMaps, null, {collapsed: false}).addTo(map);   
     </script>
