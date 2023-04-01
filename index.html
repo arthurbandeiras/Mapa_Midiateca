@@ -8,6 +8,7 @@
     
     <!-- leaflet css -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/papaparse@latest/papaparse.min.js"></script>
 
     <style>
         body{
@@ -239,7 +240,47 @@
         // console.log(inputAnovalue)
     </script>
 
-    
+    <script>
+        // URL do arquivo .csv:
+        const url = './Pagina1.csv';
+        
+        // Baixar o arquivo .csv:
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                // Passar o conteúdo do arquivo para a variável file:
+                const file = data;
+                
+                Papa.parse(file, {
+                    header: true,
+                    delimiter: ',',
+                    complete: function(results) {
+                        // Obter as colunas do arquivo:
+                        const columns = results.meta.fields;
+                    
+                        // Criar uma lista vazia para cada coluna:
+                        const data = columns.map(() => []);
+                    
+                        // Para cada linha do arquivo:
+                        results.data.forEach(row => {
+                            // Para cada coluna:
+                            columns.forEach((column, index) => {
+                                // Adicionar o valor da célula à lista correspondente:
+                                data[index].push(row[column]);
+                            });
+                        });
+                    
+                        // Imprimir as colunas no console:
+                        data.forEach((column, index) => {
+                        console.log(`Coluna ${index}: ${column}`);
+                        });
+                    }
+                });
+            })
+            
+            .catch(error => console.error(error));
+    </script>    
+
     <script>       
 
         /**************************
